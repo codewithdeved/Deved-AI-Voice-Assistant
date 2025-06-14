@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="Deved AI Assistant - Your Roman Urdu & English AI Voice Assistant">
+    <meta name="theme-color" content="#667eea">
+    <Link rel="icon" href="../static/images/tab-icon.png">
+    </Link>
+    <link rel="preload" href="../static/style.css" as="style" onload="this.rel='stylesheet'">
+    <title>Deved - AI Voice Assistant</title>
+
+    <style>
+        body {
+            visibility: hidden;
+        }
+
+        .app-container {
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+
+            <div class="sidebar-header">
+
+                <div class="logo-container">
+                    <div class="brand-logo">
+                        <div class="logo-icon">D</div>
+                        <div class="brand-text">
+                            <div class="brand-name">DEVED</div>
+                            <div class="brand-tagline">AI VOICE ASSISTANT</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="new-chat-btn" id="newChatBtn" title="Create New Chat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14" />
+                    </svg>
+                    <span class="new-chat-text">New Chat</span>
+                </button>
+
+            </div>
+
+            <div class="chat-history" id="chatHistory"></div>
+
+            <div class="sidebar-footer">
+
+                <div class="footer-info">
+                    <div class="footer-logo">DEVED</div>
+                    <div class="footer-copyright">&copy; Powered by Devedians.</div>
+                </div>
+
+                <div class="profile-dropdown">
+
+                    <div class="profile-trigger" id="profileTrigger">
+                        <div class="admin-profile">
+                            <img src="../static/images/admin.png" alt="Admin">
+                        </div>
+                    </div>
+
+                    <div class="dropdown-menu" id="dropdownMenu">
+
+                        <div class="dropdown-header">
+                            <div class="dropdown-user">
+                                <div class="profile-avatar">T</div>
+                                <div class="dropdown-user-info">
+                                    <h3>Tayyab Ali</h3>
+                                    <p>Premium Member since 2024</p>
+                                </div>
+                            </div>
+                            <div class="connection-status" id="connectionStatus" aria-live="polite">
+                                <span class="status-indicator" id="statusIndicator" aria-hidden="true"></span>
+                                <span class="status-text">Connecting...</span>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-content">
+
+                            <div class="dropdown-section">
+
+                                <div class="toggle-item">
+                                    <div class="toggle-label">
+                                        <div class="toggle-title">Theme</div>
+                                        <div class="toggle-description">Light/Dark Mode</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="themeToggle"
+                                            aria-label="Toggle between light and dark theme">
+                                        <span id="theme-slider" title="Switch to Dark Mode" class="toggle-slider"
+                                            data-action="toggle-theme"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-item">
+                                    <div class="toggle-label">
+                                        <div class="toggle-title">Sidebar</div>
+                                        <div class="toggle-description">Collapse/Expand</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="sidebarToggle">
+                                        <span class="toggle-slider" title="Close Sidebar" id="sidebar-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-item">
+                                    <div class="toggle-label">
+                                        <div class="toggle-title">Chats</div>
+                                        <div class="toggle-description">Delete All Chats</div>
+                                    </div>
+                                    <button type="button" class="delete-all-chats-btn" title="Delete All Chats">
+                                        <svg id="delete-all-chats" class="toggle-icon"
+                                            xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                            fill="currentColor" viewBox="0 0 256 256">
+                                            <path
+                                                d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <div class="dropdown-actions">
+                                <button type="button" class="dropdown-btn">Settings</button>
+                                <button type="button" class="dropdown-btn primary">Sign Out</button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <button id="sidebar-expand-btn" type="button" class="sidebar-expand-btn" title="Open Sidebar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    class="icon-lg-heavy max-md:hidden">
+                    <path
+                        d="M8 5.4541C8 5.42548 8.00155 5.39716 8.00391 5.36914C7.55522 5.37527 7.18036 5.38745 6.85449 5.41406C6.32513 5.45732 5.99243 5.53344 5.74121 5.6416L5.6377 5.69043C5.14381 5.94215 4.73058 6.32494 4.44238 6.79492L4.32715 7.00098C4.19296 7.26434 4.10023 7.61261 4.05078 8.21777C4.00041 8.83458 4 9.62723 4 10.7637V13.2363C4 14.3728 4.00039 15.1654 4.05078 15.7822C4.10023 16.3871 4.19298 16.7347 4.32715 16.998L4.44238 17.2041C4.73056 17.6741 5.14377 18.0568 5.6377 18.3086L5.74121 18.3574C5.99244 18.4656 6.32506 18.5417 6.85449 18.585C7.17941 18.6115 7.55304 18.6228 8 18.6289V5.4541ZM22 13.2363C22 14.3396 22.001 15.2273 21.9424 15.9443C21.8903 16.5821 21.7876 17.1524 21.5605 17.6816L21.4551 17.9063C20.9758 18.8468 20.211 19.6115 19.2705 20.0908H19.2695C18.6773 20.3925 18.0373 20.5186 17.3086 20.5781C16.5914 20.6367 15.7032 20.6357 14.5996 20.6357H9.40039C9.27572 20.6357 9.15341 20.6339 9.03418 20.6338C9.02282 20.6342 9.01146 20.6357 9 20.6357C8.98557 20.6357 8.97131 20.6334 8.95703 20.6328C8.05556 20.632 7.31 20.6287 6.69141 20.5781C6.05356 20.526 5.48347 20.4235 4.9541 20.1963L4.73047 20.0908C3.84834 19.6413 3.12017 18.9412 2.6377 18.0801L2.54492 17.9063C2.24315 17.3139 2.11717 16.6732 2.05762 15.9443C1.99905 15.2273 2 14.3396 2 13.2363V10.7637C2 9.66008 1.99903 8.77186 2.05762 8.05469C2.11716 7.32598 2.24327 6.68595 2.54492 6.09375L2.6377 5.91895C3.12017 5.05789 3.8484 4.35763 4.73047 3.9082L4.9541 3.80274C5.48344 3.57561 6.05359 3.47301 6.69141 3.4209C7.40857 3.36231 8.29681 3.36328 9.40039 3.36328H14.5996C15.7032 3.36328 16.5914 3.36231 17.3086 3.4209C18.0373 3.48044 18.6773 3.60656 19.2695 3.9082L19.4443 4.00195C20.3052 4.48442 21.0057 5.21184 21.4551 6.09375L21.5605 6.31738C21.7877 6.84672 21.8903 7.41688 21.9424 8.05469C22.001 8.77186 22 9.66008 22 10.7637V13.2363ZM10 18.6357H14.5996C15.7361 18.6357 16.5287 18.6353 17.1455 18.585C17.7507 18.5355 18.0989 18.4428 18.3623 18.3086L18.5684 18.1934C19.0383 17.9051 19.4211 17.492 19.6729 16.998L19.7217 16.8945C19.8298 16.6434 19.906 16.3112 19.9492 15.7822C19.9996 15.1654 20 14.3728 20 13.2363V10.7637C20 9.62722 19.9996 8.83458 19.9492 8.21777C19.906 7.68841 19.8299 7.35572 19.7217 7.10449L19.6729 7.00098C19.4211 6.50707 19.0383 6.09385 18.5684 5.80567L18.3623 5.69043C18.0989 5.55623 17.7507 5.46351 17.1455 5.41406C16.5287 5.36369 15.736 5.36328 14.5996 5.36328H9.99609C9.99879 5.39319 10 5.42349 10 5.4541V18.6357Z"
+                        fill="currentColor"></path>
+                </svg>
+            </button>
+
+            <div id="start-screen" class="start-screen">
+
+                <section class="earth">
+                    <figure class="globe">
+                    </figure>
+                </section>
+
+                <div class="welcome-content">
+
+                    <h1 class="greeting-title">
+                        Hello! It's Me Deved
+                    </h1>
+                    <h2 class="greeting-subtitle">
+                        How May I Optimize Your Experience Today?
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="chat-messages" id="chatMessages"></div>
+
+            <div class="chat-input-area">
+                <div class="input-container">
+                    <textarea id="chatInput" class="chat-input" title="Type your prompt..."
+                        placeholder="Type your prompt..." rows="1"></textarea>
+
+                    <div class="input-actions">
+                        <input type="file" id="audioInput" accept=".wav,.mp3,.ogg,.flac,.webm" style="display: none;">
+
+                        <button type="button" id="uploadAudioBtn" class="action-btn" title="Upload audio file">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7,10 12,15 17,10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                        </button>
+
+                        <button type="button" id="recordBtn" class="action-btn record-btn" title="Record voice message">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                <line x1="12" y1="19" x2="12" y2="23" />
+                                <line x1="8" y1="23" x2="16" y2="23" />
+                            </svg>
+                        </button>
+
+                        <button type="button" id="sendBtn" class="action-btn send-btn" title="Send message">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13" />
+                                <polygon points="22,2 15,22 11,13 2,9 22,2" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <div id="confirmModal" class="confirm-modal">
+            <div class="modal-content">
+                <p id="modalMessage"></p>
+                <div class="modal-buttons">
+                    <button type="button" id="modalCancelBtn">Cancel</button>
+                    <button type="button" id="modalDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../static/script.js" defer></script>
+    <script src="../static/earth.js"></script>
+
+    <script>
+        window.addEventListener('load', () => {
+            document.body.style.visibility = 'visible';
+            document.querySelector('.app-container').style.display = 'flex';
+        });
+    </script>
+
+</body>
+
+</html>

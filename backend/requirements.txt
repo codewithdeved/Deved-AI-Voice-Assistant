@@ -1,0 +1,5 @@
+requests
+python-dotenv
+elevenlabs
+flask
+flask-cors
