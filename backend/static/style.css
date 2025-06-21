@@ -921,10 +921,25 @@ body {
     font-family: inherit;
     font-size: 1rem;
     line-height: 1.5;
-    max-height: 120px;
+    max-height: 300px;
     color: var(--text-primary);
     background: inherit;
-    overflow-y: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.chat-input::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-input::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.chat-input::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .chat-input::placeholder {

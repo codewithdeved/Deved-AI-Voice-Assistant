@@ -270,6 +270,7 @@ class DevedAssistant {
                 e.preventDefault();
                 e.stopPropagation();
                 this.enqueueMessage();
+                if (this.elements.chatInput) this.elements.chatInput.blur();
             });
         }
 
@@ -279,13 +280,21 @@ class DevedAssistant {
                     e.preventDefault();
                     e.stopPropagation();
                     this.enqueueMessage();
+                    if (this.elements.chatInput) this.elements.chatInput.blur();
                 }
             });
         }
 
         chatInput?.addEventListener('input', () => {
             chatInput.style.height = 'auto';
-            chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+            const maxHeight = 300;
+            const newHeight = Math.min(chatInput.scrollHeight, maxHeight);
+            chatInput.style.height = newHeight + 'px';
+            if (newHeight === maxHeight) {
+                chatInput.style.overflowY = 'auto';
+            } else {
+                chatInput.style.overflowY = 'hidden';
+            }
             if (sendBtn) {
                 sendBtn.disabled = !chatInput.value.trim() || !this.isConnected;
             }
@@ -380,6 +389,7 @@ class DevedAssistant {
         this.elements.chatInput.value = '';
         this.elements.chatInput.style.height = 'auto';
         if (this.elements.sendBtn) this.elements.sendBtn.disabled = true;
+        if (this.elements.chatInput) this.elements.chatInput.blur();
 
         this.processMessageQueue();
     }
@@ -653,7 +663,7 @@ class DevedAssistant {
         snippetElement.replaceWith(input);
         snippetActions.classList.remove('hidden');
         input.focus();
-        input.setSelectionRange(0, 0);
+        input.setSelectionRange(input.value.length, input.value.length);
 
         const saveSnippet = () => {
             const newSnippet = input.value.trim();
@@ -1059,7 +1069,11 @@ class DevedAssistant {
                 audioPath: data.audio_path || null
             };
 
-            currentChat.messages.push(assistantMessageData);
+            // Only add the assistant message if it's not already present
+            const existingAssistantMsg = currentChat.messages.find(msg => msg.id === assistantMessageId);
+            if (!existingAssistantMsg) {
+                currentChat.messages.push(assistantMessageData);
+            }
             currentChat.lastUpdated = responseTimestamp;
 
             const snippetText = currentChat.customSnippet || assistantMessage;
@@ -1158,11 +1172,8 @@ class DevedAssistant {
                 if (bubble && bubble.innerHTML !== this.escapeHtml(text)) {
                     bubble.innerHTML = this.escapeHtml(text);
                 }
-
-                if (audioPath && sender === 'assistant') {
-                    const existingAudio = existingMessage.querySelector('audio');
-                    if (!existingAudio) {
-                        const audioHtml = `
+                if (audioPath && sender === 'assistant' && !existingMessage.querySelector('audio')) {
+                    const audioHtml = `
                         <div class="audio-player">
                             <audio controls preload="metadata">
                                 <source src="${this.apiUrl}/audio/${encodeURIComponent(audioPath)}" type="audio/mpeg">
@@ -1171,13 +1182,12 @@ class DevedAssistant {
                             </audio>
                         </div>
                     `;
-                        const content = existingMessage.querySelector('.message-content');
-                        if (content) {
-                            content.insertBefore(new DOMParser().parseFromString(audioHtml, 'text/html').body.firstChild, content.querySelector('.message-actions'));
-                        }
+                    const content = existingMessage.querySelector('.message-content');
+                    if (content) {
+                        content.insertBefore(new DOMParser().parseFromString(audioHtml, 'text/html').body.firstChild, content.querySelector('.message-actions'));
                     }
                 }
-
+                this.scrollToBottom();
                 return;
             }
 
@@ -1187,14 +1197,14 @@ class DevedAssistant {
 
             if (audioPath && sender === 'assistant') {
                 audioHtml = `
-                <div class="audio-player">
-                    <audio controls preload="metadata">
-                        <source src="${this.apiUrl}/audio/${encodeURIComponent(audioPath)}" type="audio/mpeg">
-                        <source src="${this.apiUrl}/audio/${encodeURIComponent(audioPath)}" type="audio/wav">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
-            `;
+                    <div class="audio-player">
+                        <audio controls preload="metadata">
+                            <source src="${this.apiUrl}/audio/${encodeURIComponent(audioPath)}" type="audio/mpeg">
+                            <source src="${this.apiUrl}/audio/${encodeURIComponent(audioPath)}" type="audio/wav">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                `;
             }
 
             const messageDiv = document.createElement('div');
@@ -1203,29 +1213,29 @@ class DevedAssistant {
             messageDiv.setAttribute('data-message-id', finalMessageId);
 
             const copySvg = `
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-md-heavy">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z" fill="currentColor"></path>
-            </svg>
-        `;
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-md-heavy">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M7 5C7 3.34315 8.34315 2 10 2H19C20.6569 2 22 3.34315 22 5V14C22 15.6569 20.6569 17 19 17H17V19C17 20.6569 15.6569 22 14 22H5C3.34315 22 2 20.6569 2 19V10C2 8.34315 3.34315 7 5 7H7V5ZM9 7H14C15.6569 7 17 8.34315 17 10V15H19C19.5523 15 20 14.5523 20 14V5C20 4.44772 19.5523 4 19 4H10C9.44772 4 9 4.44772 9 5V7ZM5 9C4.44772 9 4 9.44772 4 10V19C4 19.5523 4.44772 20 5 20H14C14.5523 20 15 19.5523 15 19V10C15 9.44772 14.5523 9 14 9H5Z" fill="currentColor"></path>
+                </svg>
+            `;
             const checkSvg = `
-            <svg class="check-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-md-heavy">
-                <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        `;
+                <svg class="check-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-md-heavy">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            `;
 
             messageDiv.innerHTML = `
-            <div class="message-avatar">${avatarText}</div>
-            <div class="message-content">
-                <div class="message-bubble">${this.escapeHtml(text)}</div>
-                ${audioHtml}
-                <div class="message-actions">
-                    <span class="message-time">${time}</span>
-                    <button type="button" class="message-copy" title="Copy">
-                        ${copySvg}
-                    </button>
+                <div class="message-avatar">${avatarText}</div>
+                <div class="message-content">
+                    <div class="message-bubble">${this.escapeHtml(text)}</div>
+                    ${audioHtml}
+                    <div class="message-actions">
+                        <span class="message-time">${time}</span>
+                        <button type="button" class="message-copy" title="Copy">
+                            ${copySvg}
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
 
             this.elements.chatMessages.appendChild(messageDiv);
 
@@ -1295,21 +1305,34 @@ class DevedAssistant {
     scrollToBottom() {
         if (!this.elements.chatMessages) return;
 
-        requestAnimationFrame(() => {
-            this.elements.chatMessages.scrollTo({
-                top: this.elements.chatMessages.scrollHeight,
-                behavior: 'smooth'
-            });
-            setTimeout(() => {
-                const { scrollTop, scrollHeight, clientHeight } = this.elements.chatMessages;
-                if (Math.abs(scrollHeight - scrollTop - clientHeight) > 1) {
-                    this.elements.chatMessages.scrollTo({
-                        top: this.elements.chatMessages.scrollHeight,
-                        behavior: 'smooth'
-                    });
-                }
-            }, 500);
+        const scrollToBottomInternal = () => {
+            const { scrollHeight, clientHeight, scrollTop } = this.elements.chatMessages;
+            const targetScroll = scrollHeight - clientHeight;
+            if (Math.abs(scrollTop - targetScroll) > 1) {
+                this.elements.chatMessages.scrollTo({
+                    top: targetScroll,
+                    behavior: 'smooth'
+                });
+            }
+        };
+
+        const observer = new MutationObserver(() => {
+            scrollToBottomInternal();
+            observer.disconnect();
         });
+
+        observer.observe(this.elements.chatMessages, {
+            childList: true,
+            subtree: true,
+            attributes: true
+        });
+
+        requestAnimationFrame(scrollToBottomInternal);
+
+        setTimeout(() => {
+            scrollToBottomInternal();
+            observer.disconnect();
+        }, 300);
     }
 
     escapeHtml(text) {
